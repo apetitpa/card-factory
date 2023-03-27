@@ -16,7 +16,14 @@ class CardTest extends TestCase
         $card = new Card(CardValue::Ace, CardSuit::Spades);
 
         $this->assertInstanceOf(Card::class, $card);
-        $this->assertEquals(CardSuit::Spades, $card->getSuit());
-        $this->assertEquals(CardValue::Ace, $card->getValue());
+        $this->assertSame(CardSuit::Spades, $card->getSuit());
+        $this->assertSame(CardValue::Ace, $card->getValue());
+    }
+
+    public function testToString(): void
+    {
+        $card = new Card(CardValue::Ace, CardSuit::Spades);
+
+        $this->assertSame('AS', (string) $card);
     }
 }

@@ -9,13 +9,9 @@ use Apetitpa\CardFactory\Enum\CardValue;
 
 class Deck
 {
-    /** @var Card[] */
-    private array $cards;
-
     /** @param Card[] $cards */
-    private function __construct(array $cards)
+    private function __construct(private array $cards)
     {
-        $this->cards = $cards;
     }
 
     public static function createStandardDeck(bool $shuffle = true): self
@@ -31,6 +27,8 @@ class Deck
 
         if ($shuffle) {
             $deck->shuffle();
+        } else {
+            $deck->sort();
         }
 
         return $deck;
@@ -39,6 +37,16 @@ class Deck
     public function shuffle(): void
     {
         shuffle($this->cards);
+    }
+
+    public function sort(): void {
+        usort($this->cards, function (Card $a, Card $b) {
+            if ($a->getSuit() === $b->getSuit()) {
+                return $a->getValue()->value <=> $b->getValue()->value;
+            }
+
+            return $a->getSuit()->value <=> $b->getSuit()->value;
+        });
     }
 
     public function drawCard(): ?Card
