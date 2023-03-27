@@ -1,4 +1,4 @@
-.PHONY: install test phpstan psalm clean
+.PHONY: install test phpstan psalm cs clean
 
 install:
 	composer install
@@ -11,6 +11,8 @@ phpstan:
 
 psalm:
 	vendor/bin/psalm src tests
+
+cs: phpstan psalm
 
 clean:
 	rm -rf vendor/

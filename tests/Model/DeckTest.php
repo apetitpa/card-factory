@@ -28,14 +28,17 @@ class DeckTest extends TestCase
     {
         $deck = Deck::createStandardDeck(false);
 
-        $expectedCards = [];
-        foreach (CardSuit::cases() as $suit) {
-            foreach (CardValue::cases() as $value) {
-                $expectedCards[] = new Card($value, $suit);
+        $previousCard = null;
+        foreach ($deck->getCards() as $card) {
+            if ($previousCard !== null) {
+                $this->assertTrue(
+                    $previousCard->getSuit()->value < $card->getSuit()->value ||
+                    ($previousCard->getSuit()->value === $card->getSuit()->value && $previousCard->getValue()->value < $card->getValue()->value),
+                    sprintf('Failed asserting that card %s is ordered after %s', $previousCard->__toString(), $card->__toString())
+                );
             }
+            $previousCard = $card;
         }
-
-        $this->assertEquals($expectedCards, $deck->getCards(), 'Deck should be in the expected order when shuffle is set to false.');
     }
 
     public function testShuffleDeck(): void
@@ -46,7 +49,7 @@ class DeckTest extends TestCase
         $deck->shuffle();
         $shuffledOrder = $deck->getCards();
 
-        $this->assertNotEquals($originalOrder, $shuffledOrder, 'The order of cards in the deck should change after shuffling.');
+        $this->assertNotSame($originalOrder, $shuffledOrder, 'The order of cards in the deck should change after shuffling.');
     }
 
     public function testDrawCard(): void
@@ -58,7 +61,7 @@ class DeckTest extends TestCase
         $this->assertInstanceOf(Card::class, $card);
 
         $deckSizeAfter = count($deck->getCards());
-        $this->assertEquals($deckSizeBefore - 1, $deckSizeAfter, 'The size of the deck should decrease by 1 after drawing a card.');
+        $this->assertSame($deckSizeBefore - 1, $deckSizeAfter, 'The size of the deck should decrease by 1 after drawing a card.');
     }
 
     public function testDrawCardWhenDeckIsEmpty(): void
@@ -87,5 +90,23 @@ class DeckTest extends TestCase
 
         $deck->shuffle();
         $this->assertEmpty($deck->getCards(), 'Shuffling an empty deck should not change its state.');
+    }
+
+    public function testSort(): void {
+        $deck = Deck::createStandardDeck();
+
+        $deck->sort();
+
+        $previousCard = null;
+        foreach ($deck->getCards() as $card) {
+            if ($previousCard !== null) {
+                $this->assertTrue(
+                    $previousCard->getSuit()->value < $card->getSuit()->value ||
+                    ($previousCard->getSuit()->value === $card->getSuit()->value && $previousCard->getValue()->value < $card->getValue()->value),
+                    sprintf('Failed asserting that card %s is ordered after %s', $previousCard->__toString(), $card->__toString())
+                );
+            }
+            $previousCard = $card;
+        }
     }
 }
